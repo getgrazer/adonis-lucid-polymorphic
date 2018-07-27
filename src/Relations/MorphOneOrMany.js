@@ -27,7 +27,7 @@ class MorphOneOrMany extends BaseRelation {
   _decorateRead () {
     this.relatedQuery
       .where(this.typeKey, this.typeValue)
-      .where(this.toKey, this.parent[this.fromKey])
+      .where(this.toKey, this.parentInstance[this.fromKey])
   }
 
   /**
@@ -39,8 +39,8 @@ class MorphOneOrMany extends BaseRelation {
    */
   exists (callback) {
     const relatedQuery = this.relatedQuery
-      .whereRaw(`${this.related.table}.${this.typeKey} = '${this.typeValue}'`)
-      .whereRaw(`${this.related.table}.${this.toKey} = ${this.parent.constructor.table}.${this.fromKey}`)
+      .whereRaw(`${this.RelatedModel.table}.${this.typeKey} = '${this.typeValue}'`)
+      .whereRaw(`${this.RelatedModel.table}.${this.toKey} = ${this.parentInstance.constructor.table}.${this.fromKey}`)
     if (typeof (callback) === 'function') {
       callback(relatedQuery)
     }
@@ -56,8 +56,8 @@ class MorphOneOrMany extends BaseRelation {
   counts (callback) {
     const relatedQuery = this.relatedQuery
       .count('*')
-      .whereRaw(`${this.related.table}.${this.typeKey} = '${this.typeValue}'`)
-      .whereRaw(`${this.related.table}.${this.toKey} = ${this.parent.constructor.table}.${this.fromKey}`)
+      .whereRaw(`${this.RelatedModel.table}.${this.typeKey} = '${this.typeValue}'`)
+      .whereRaw(`${this.RelatedModel.table}.${this.toKey} = ${this.parentInstance.constructor.table}.${this.fromKey}`)
     if (typeof (callback) === 'function') {
       callback(relatedQuery)
     }
@@ -74,19 +74,20 @@ class MorphOneOrMany extends BaseRelation {
    * @public
    */
   async save (relatedInstance) {
-    if (relatedInstance instanceof this.related === false) {
+    if (relatedInstance instanceof this.RelatedModel === false) {
       throw CE.ModelRelationException.relationMisMatch('save accepts an instance of related model')
     }
-    if (this.parent.isNew()) {
-      throw CE.ModelRelationException.unSavedTarget('save', this.parent.constructor.name, this.related.name)
+    if (this.parentInstance.isNew) {
+      throw CE.ModelRelationException.unSavedTarget('save', this.parentInstance.constructor.name, this.RelatedModel.name)
     }
-    if (!this.parent[this.fromKey]) {
+    if (!this.parentInstance[this.fromKey]) {
       logger.warn(`Trying to save relationship with ${this.fromKey} as primaryKey, whose value is falsy`)
     }
-    relatedInstance[this.toKey] = this.parent[this.fromKey]
+    relatedInstance[this.toKey] = this.parentInstance[this.fromKey]
     relatedInstance[this.typeKey] = this.typeValue
     return relatedInstance.save()
   }
 }
 
 module.exports = MorphOneOrMany
+
