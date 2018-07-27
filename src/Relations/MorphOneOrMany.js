@@ -13,8 +13,8 @@ const logger = new CatLog('adonis:lucid')
 const { ioc } = require('@adonisjs/fold')
 
 class MorphOneOrMany extends BaseRelation {
-  constructor (parent, related, determiner, primaryKey) {
-    super(parent, ioc.use(related))
+  constructor (parent, related, determiner, primaryKey, foreignKey) {
+    super(parent, ioc.use(related), primaryKey, foreignKey)
     this.fromKey = primaryKey || parent.constructor.primaryKey
     this.toKey = determiner ? `${determiner}_id` : 'parent_id'
     this.typeKey = determiner ? `${determiner}_type` : 'parent_type'

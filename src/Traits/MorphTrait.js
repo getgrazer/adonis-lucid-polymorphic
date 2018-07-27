@@ -18,12 +18,13 @@ class MorpthTrait {
      * @param  {Object}  related
      * @param  {String}  [determiner]
      * @param  {String}  [primaryKey]
+     * @param  {String}  [foreignKey]
      * @return {Object}
      *
      * @public
      */
-    Model.prototype.morphMany = function (related, determiner, primaryKey) {
-      return new Relations.MorphMany(this, related, determiner, primaryKey)
+    Model.prototype.morphMany = function (related, determiner, primaryKey, foreignKey) {
+      return new Relations.MorphMany(this, related, determiner, primaryKey, foreignKey)
     }
 
     /**
